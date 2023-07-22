@@ -1,5 +1,6 @@
 import { useLocation, Router } from "react-router";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { GithubHelper } from "@pages/content/components/expodium-helper/github-helper";
 
 export default function App() {
   return (
@@ -12,6 +13,15 @@ export default function App() {
 const ExpodiumHelper = () => {
   const baseUrl = useBaseUrl();
   console.log(baseUrl);
+  switch (baseUrl) {
+    case "https://github.com":
+      return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <GithubHelper />
+          <div>Test</div>
+        </Suspense>
+      );
+  }
   return null;
 };
 
