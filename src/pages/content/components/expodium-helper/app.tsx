@@ -12,13 +12,12 @@ export default function App() {
 
 const ExpodiumHelper = () => {
   const baseUrl = useBaseUrl();
-  console.log(baseUrl);
+
   switch (baseUrl) {
     case "https://github.com":
       return (
         <Suspense fallback={<div>Loading...</div>}>
           <GithubHelper />
-          <div>Test</div>
         </Suspense>
       );
   }

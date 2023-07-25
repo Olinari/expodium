@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
 import App from "@src/pages/content/components/expodium-helper/app";
-import refreshOnUpdate from "virtual:reload-on-update-in-view";
 const style = document.createElement("style");
 
 style.textContent = `
@@ -30,16 +29,15 @@ style.textContent = `
     @keyframes gradient {
         0% {
             background-position: 0% 100%;
-            opacity: 0.8;
-        
+            scale:0.9;
         }
         50% {
             background-position: 100% 50%;
-            opacity: 0.9;
+            scale:1.1;
         }
         100% {
             background-position: 0% 100%;
-            opacity: 0.8;
+            scale:0.9;
         }
 `;
 

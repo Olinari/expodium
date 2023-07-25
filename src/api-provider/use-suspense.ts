@@ -13,6 +13,7 @@ export const useSuspense = (asyncFunction, args) => {
         pendingPromises.delete(key);
       })
       .catch((err) => {
+        cache.set(key, err);
         pendingPromises.delete(key);
         throw err;
       });

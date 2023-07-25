@@ -11,11 +11,19 @@ export interface IApiProvider {
 export default class ApiProvider implements IApiProvider {
   public client;
 
-  constructor({ baseURL, token }: { baseURL: string; token: string }) {
+  constructor({
+    baseURL,
+
+    authorization,
+  }: {
+    baseURL: string;
+
+    authorization: string;
+  }) {
     this.client = axios.create({
       baseURL,
       headers: {
-        Authorization: `token: ${token}`,
+        Authorization: authorization,
         "Content-Type": "application/json",
       },
     });
