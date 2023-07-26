@@ -26,8 +26,7 @@
 - [Documents](#documents)
 
 ## Intro <a name="intro"></a>
-This boilerplate is made for creating chrome extensions using React and Typescript.
-> The focus was on improving the build speed and development experience with Vite.
+This project is a boilerplate for creating Chrome extensions using React and TypeScript. It is designed to improve the build speed and development experience with Vite.
 
 ## Features <a name="features"></a>
 - [React 18](https://reactjs.org/)
@@ -40,22 +39,22 @@ This boilerplate is made for creating chrome extensions using React and Typescri
 - [ESLint](https://eslint.org/)
 - [Prettier](https://prettier.io/)
 - [Chrome Extension Manifest Version 3](https://developer.chrome.com/docs/extensions/mv3/intro/)
-- HRR(Hot Rebuild & Refresh/Reload)
+- Hot Rebuild & Refresh/Reload (HRR)
 
 ## Installation <a name="installation"></a>
 
 ### Procedures <a name="procedures"></a>
 1. Clone this repository.
-2. Change `name` and `description` in package.json => **Auto synchronize with manifest** 
-3. Run `yarn install` or `npm i` (check your node version >= 16.6, recommended >= 18)
-4. Run `yarn dev` or `npm run dev`
-5. Load Extension on Chrome
-   1. Open - Chrome browser
-   2. Access - chrome://extensions
-   3. Check - Developer mode
-   4. Find - Load unpacked extension
-   5. Select - `dist` folder in this project (after dev or build)
-6. If you want to build in production, Just run `yarn build` or `npm run build`.
+2. Change `name` and `description` in package.json. This will automatically synchronize with the manifest.
+3. Run `yarn install` or `npm i`. Make sure your node version is >= 16.6 (>= 18 is recommended).
+4. Run `yarn dev` or `npm run dev`.
+5. Load the extension on Chrome:
+   1. Open Chrome browser.
+   2. Access chrome://extensions.
+   3. Enable Developer mode.
+   4. Click on "Load unpacked extension".
+   5. Select the `dist` folder in this project (after running dev or build).
+6. If you want to build in production, run `yarn build` or `npm run build`.
 
 ## Screenshots <a name="screenshots"></a>
 
@@ -72,10 +71,10 @@ This boilerplate is made for creating chrome extensions using React and Typescri
 - https://github.com/Jonghakseo/pr-commit-noti
 
 ## Documents <a name="documents"></a>
-- [Vite Plugin](https://vitejs.dev/guide/api-plugin.html)
-- [ChromeExtension](https://developer.chrome.com/docs/extensions/mv3/)
-- [Rollup](https://rollupjs.org/guide/en/)
-- [Rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
+- [Vite Plugin Guide](https://vitejs.dev/guide/api-plugin.html)
+- [Chrome Extension Documentation](https://developer.chrome.com/docs/extensions/mv3/)
+- [Rollup Guide](https://rollupjs.org/guide/en/)
+- [Rollup Plugin for Chrome Extension](https://www.extend-chrome.dev/rollup-plugin)
 
 
 ## Star History
