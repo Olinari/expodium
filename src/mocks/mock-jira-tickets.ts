@@ -6,27 +6,27 @@ export default [
       "A button needs to be added to the homepage. When clicked, it should redirect the user to the about page.",
   },
   {
-    id: "JIRA-91023",
-    title: "Create an API endpoint ",
+    id: "JIRA-289013",
+    title: "Implement a button",
     description:
-      "We need a new GET API endpoint at '/users' that returns a list of all users.",
+      "A button needs to be added to the homepage. When clicked, it should perform a GET request to the /users endpoint.",
   },
   {
-    id: "JIRA-93303",
-    title: "Add form validation",
+    id: "JIRA-289013",
+    title: "Implement a button",
     description:
-      "The signup form lacks any kind of validation. Implement basic validation to the form fields.",
+      "A button needs to be added to the homepage. When clicked, it should perform a POST request to the /users endpoint.",
   },
   {
-    id: "JIRA-03123",
-    title: "Fix the dropdown menu",
+    id: "JIRA-289013",
+    title: "Implement a button",
     description:
-      "The dropdown menu on the settings page is not opening. This issue needs to be fixed.",
+      "A button needs to be added to the homepage. When clicked, it should redirect the user to the about-company page.",
   },
   {
-    id: "JIRA-13545",
-    title: "Develop a search function",
+    id: "JIRA-289013",
+    title: "Implement a button",
     description:
-      "Implement a search function to the website that can search all pages and posts.",
+      "A button needs to be added to the homepage. When clicked, it should redirect the user to the about page. and perform a GET request to the /users endpoint.",
   },
 ];

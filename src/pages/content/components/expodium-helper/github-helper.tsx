@@ -7,7 +7,7 @@ import MockJiraTickets from "@src/mocks/mock-jira-tickets";
 export const GithubHelper = () => {
   const explainedCode = useSuspense(OpenAiService.explainCode, [
     {
-      code: "let btn = document.createElement('button'); btn.addEventListener('click', function() { window.location.href = '/about'; }); document.body.appendChild(btn); ",
+      code: "let btn = document.createElement('button'); btn.addEventListener('click', function() { window.location.href = '/about'; }); document.body.appendChild(btn);",
     },
   ]);
 

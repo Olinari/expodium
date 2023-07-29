@@ -9,7 +9,7 @@ export default [
   },
   {
     id: "JS-003",
-    code: `let form = document.getElementById('signupForm'); form.onsubmit = function(e) { e.preventDefault(); if(!isEmail(e.data?.email)){ throw new Error("email is not valid"))} };`,
+    code: `let form = document.getElementById('signupForm'); form.onsubmit = function(e) { e.preventDefault(); if(!isEmail(e.data?.email)){ throw new Error("Please check the email"))} };`,
   },
   {
     id: "JS-004",
