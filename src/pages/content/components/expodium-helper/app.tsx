@@ -1,31 +1,54 @@
-import { useLocation, Router } from "react-router";
-import { useEffect, useState } from "react";
+import {
+  generateCode,
+  transcribeAudio,
+} from "@pages/content/components/expodium-helper/text-to-code";
+import { useRef, useState } from "react";
+import { actions } from "@pages/content/components/expodium-helper/execute-commands";
 
-export default function App() {
+const App = () => {
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = new MediaRecorder(stream);
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      audioChunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = async () => {
+      const audioBlob = new Blob(audioChunksRef.current);
+      const text = await transcribeAudio(audioBlob);
+      const code = await generateCode(
+        text,
+        actions,
+        document.documentElement.outerHTML
+      );
+      console.log(code);
+
+      audioChunksRef.current = []; // Clear the chunks after using them
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
-    <Router location={location} navigator={undefined}>
-      <ExpodiumHelper />
-    </Router>
+    <div>
+      {isRecording ? (
+        <button onClick={stopRecording}>Stop </button>
+      ) : (
+        <button onClick={startRecording}>Start </button>
+      )}
+    </div>
   );
-}
-
-const ExpodiumHelper = () => {
-  const baseUrl = useBaseUrl();
-  console.log(baseUrl);
-  return null;
 };
-
-const useBaseUrl = () => {
-  const location = useLocation();
-
-  const [baseUrl, setBaseUrl] = useState("");
-
-  useEffect(() => {
-    setBaseUrl(
-      `${window.location.protocol}//${window.location.hostname}${
-        window.location.port ? `:${window.location.port}` : ""
-      }`
-    );
-  }, [location]);
-  return baseUrl;
-};
+export default App;

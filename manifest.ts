@@ -8,11 +8,13 @@ const manifest: chrome.runtime.ManifestV3 = {
   name: packageJson.name,
   version: packageJson.version,
   description: packageJson.description,
+  permissions: ["activeTab"],
   options_page: "src/pages/options/index.html",
   background: {
     service_worker: "src/pages/background/index.js",
     type: "module",
   },
+
   action: {
     default_popup: "src/pages/popup/index.html",
     default_icon: "icon-34.png",
@@ -35,6 +37,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   web_accessible_resources: [
     {
       resources: [
+        "sandbox.html",
         "assets/js/*.js",
         "assets/css/*.css",
         "icon-128.png",
@@ -43,6 +46,9 @@ const manifest: chrome.runtime.ManifestV3 = {
       matches: ["*://*/*"],
     },
   ],
+  sandbox: {
+    pages: ["sandbox.html"],
+  },
 };
 
 export default manifest;
