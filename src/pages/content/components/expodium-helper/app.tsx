@@ -20,12 +20,14 @@ const App = () => {
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
       const text = await transcribeAudio(audioBlob);
-      const code = await generateCode(
-        text,
-        actions,
-        document.documentElement.outerHTML
-      );
-      console.log(code);
+      console.log(stringifyActions(actions));
+      const codeKey = await generateCode({
+        transcription: text,
+        actions: stringifyActions(actions),
+        html: document.documentElement.outerHTML,
+      });
+      console.log(codeKey);
+      actions[codeKey]();
 
       audioChunksRef.current = []; // Clear the chunks after using them
     };
@@ -51,4 +53,13 @@ const App = () => {
     </div>
   );
 };
+
+const stringifyActions = (obj) =>
+  JSON.stringify(obj, (key, value) => {
+    if (typeof value === "function") {
+      return value.toString();
+    }
+    return value;
+  });
+
 export default App;

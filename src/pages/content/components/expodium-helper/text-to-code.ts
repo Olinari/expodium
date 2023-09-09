@@ -12,7 +12,7 @@ export const transcribeAudio = async (audioBlob) => {
     maxBodyLength: Infinity,
     url: "https://api.openai.com/v1/audio/transcriptions",
     headers: {
-      Authorization: `Bearer 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`,
+      Authorization: `Bearer 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`,
     },
     data: data,
   };
@@ -33,27 +33,32 @@ export const transcribeAudio = async (audioBlob) => {
   }
 };
 
-export const generateCode = async (transcription, pageHTML, actions) => {
+export const generateCode = async ({ transcription, html, actions }) => {
   const config = {
     method: "post",
     maxBodyLength: Infinity,
     url: "https://api.openai.com/v1/chat/completions",
     headers: {
-      Authorization: `Bearer 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`,
+      Authorization: `Bearer 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`,
     },
     data: {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
           content:
-            "You are an assistant that generates code snippets for the voice-impaired to surf the internet. Take into account the provided HTML, the JSON of functions, and the user's voice transcription. respond with one word ONLY  the key of func you see fit to complete the users request.",
+            "You are an assistant that generates code snippets for the voice-impaired to surf the internet. Take into account the provided HTML, the JSON of functions, and the user's voice transcription. respond with one word ONLY, the key of func you see fit to complete the users request.",
+        },
+        {
+          role: "system",
+          content:
+            "the key-value pair object is " +
+            actions +
+            "choose the correct key",
         },
         {
           role: "user",
-          content: `HTML: "${pageHTML}", Functions: ${JSON.stringify(
-            actions
-          )}, Transcription: "${transcription}"`,
+          content: "my request is" + transcription,
         },
       ],
     },
