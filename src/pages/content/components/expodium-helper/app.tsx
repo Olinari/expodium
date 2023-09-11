@@ -1,9 +1,8 @@
-import {
-  generateCode,
-  transcribeAudio,
-} from "@pages/content/components/expodium-helper/text-to-code";
 import { useRef, useState } from "react";
 import { actions } from "@pages/content/components/expodium-helper/execute-commands";
+import { OpenAIService } from "@src/services/open-ai";
+
+const { generateCodeFromText, transcribeAudio } = new OpenAIService();
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -20,14 +19,14 @@ const App = () => {
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
       const text = await transcribeAudio(audioBlob);
-      console.log(stringifyActions(actions));
-      const codeKey = await generateCode({
+
+      const { key, args } = await generateCodeFromText({
         transcription: text,
         actions: stringifyActions(actions),
         html: document.documentElement.outerHTML,
       });
-      console.log(codeKey);
-      actions[codeKey]();
+      console.log(key, args);
+      actions[key](...args);
 
       audioChunksRef.current = []; // Clear the chunks after using them
     };
