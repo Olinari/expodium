@@ -1,4 +1,5 @@
 import { IApiProvider, ApiProvider } from "../api-provider";
+import { getEncodedHtmlObject } from "@pages/content/components/expodium-helper/cleanup-html";
 
 interface IOpenAIService {
   transcribeAudio: (audioBlob: Blob) => Promise<string>;
@@ -46,11 +47,9 @@ export class OpenAIService implements IOpenAIService {
 
   generateCodeFromText = async ({
     transcription,
-    html,
     actions,
   }: {
     transcription: string;
-    html: string;
     actions: string;
   }): Promise<any> => {
     const data = {
@@ -80,7 +79,7 @@ export class OpenAIService implements IOpenAIService {
   };
 
   getEmbedding = async ({ input }: { input: string }): Promise<number[]> => {
-    const response = await this.api.post("/embeddings", {
+    const response = await this.api.post("v1/embeddings", {
       input,
       model: "text-embedding-ada-002",
     });
@@ -88,18 +87,46 @@ export class OpenAIService implements IOpenAIService {
     return response.data[0].embedding as number[];
   };
 
-  explainCode = async ({
-    code,
-  }: {
-    code: string;
-  }): Promise<{ title: string; description: string }> => {
+  private async segmentHtmlByTokens(
+    html: string,
+    maxTokens = 8000
+  ): Promise<string[]> {
+    const segments: string[] = [];
+    let currentSegment = "";
+    let tokenCount = 0;
+    console.log({ html });
+    // Split the HTML into words/tags and iterate through them
+    const parts = html.split(/\s+/);
+    for (const part of parts) {
+      const partTokens = part.length; // Rough estimate of tokens. A more precise method might be needed.
+
+      if (tokenCount + partTokens > maxTokens) {
+        segments.push(currentSegment.trim());
+        currentSegment = "";
+        tokenCount = 0;
+      }
+
+      currentSegment += part + " ";
+      tokenCount += partTokens;
+    }
+    if (currentSegment.trim()) {
+      segments.push(currentSegment.trim());
+    }
+
+    return segments;
+  }
+
+  summarizePage = async (): Promise<{ title: string; description: string }> => {
+    const code = getEncodedHtmlObject();
+
     const response = await this.api.post("/v1/chat/completions", {
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         {
           role: "user",
           content:
-            "Explain the following line of code: " + JSON.stringify(code),
+            "Imagine this structure represents an html site. summarize its contents for a blind person please please" +
+            JSON.stringify(code),
         },
       ],
       model: "gpt-4",

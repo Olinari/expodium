@@ -1,13 +1,19 @@
 import { useRef, useState } from "react";
 import { actions } from "@pages/content/components/expodium-helper/execute-commands";
 import { OpenAIService } from "@src/services/open-ai";
+import { getEncodedHtmlObject } from "@pages/content/components/expodium-helper/cleanup-html";
 
-const { generateCodeFromText, transcribeAudio } = new OpenAIService();
+const { generateCodeFromText, transcribeAudio, summarizePage } =
+  new OpenAIService();
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+
+  document.addEventListener("keypress", async (event) => {
+    event.key === " " && console.log(await summarizePage());
+  });
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -23,7 +29,6 @@ const App = () => {
       const { key, args } = await generateCodeFromText({
         transcription: text,
         actions: stringifyActions(actions),
-        html: document.documentElement.outerHTML,
       });
       console.log(key, args);
       actions[key](...args);

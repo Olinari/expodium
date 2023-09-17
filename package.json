@@ -17,10 +17,12 @@
   },
   "type": "module",
   "dependencies": {
+    "@mozilla/readability": "^0.4.4",
     "axios": "^1.5.0",
     "escodegen": "^2.1.0",
     "esprima-next": "^5.8.4",
     "form-data": "^4.0.0",
+    "html-minifier": "^4.0.0",
     "js-interpreter": "^5.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
