@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import App from "@src/pages/content/components/expodium-helper/app";
+import App from "@src/pages/content/components/on-page-agent/app";
 
 describe("appTest", () => {
   test("render text", () => {

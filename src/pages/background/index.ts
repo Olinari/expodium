@@ -1,11 +1,17 @@
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 
-reloadOnUpdate("pages/background");
+import { BardService } from "@src/services/bard";
+console.log("Background Loaded");
 
-/**
- * Extension reloading is necessary because the browser automatically caches the css.
- * If you do not use the css of the content script, please delete it.
- */
+reloadOnUpdate("pages/background");
 reloadOnUpdate("pages/content/style.scss");
 
-console.log("background loaded");
+const ImageSevice = new BardService();
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "captureScreenshot") {
+    chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
+      console.log(dataUrl);
+    });
+  }
+});

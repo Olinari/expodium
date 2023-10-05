@@ -1,19 +1,15 @@
 import { useRef, useState } from "react";
-import { actions } from "@pages/content/components/expodium-helper/execute-commands";
 import { OpenAIService } from "@src/services/open-ai";
-import { getEncodedHtmlObject } from "@pages/content/components/expodium-helper/cleanup-html";
+const { transcribeAudio } = new OpenAIService();
 
-const { generateCodeFromText, transcribeAudio, summarizePage } =
-  new OpenAIService();
-
-const App = () => {
+export const VoiceToText = ({
+  onInput,
+}: {
+  onInput: (text: string) => void;
+}) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
-  document.addEventListener("keypress", async (event) => {
-    event.key === " " && console.log(await summarizePage());
-  });
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -25,14 +21,7 @@ const App = () => {
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
       const text = await transcribeAudio(audioBlob);
-
-      const { key, args } = await generateCodeFromText({
-        transcription: text,
-        actions: stringifyActions(actions),
-      });
-      console.log(key, args);
-      actions[key](...args);
-
+      onInput?.(text);
       audioChunksRef.current = []; // Clear the chunks after using them
     };
 
@@ -57,13 +46,3 @@ const App = () => {
     </div>
   );
 };
-
-const stringifyActions = (obj) =>
-  JSON.stringify(obj, (key, value) => {
-    if (typeof value === "function") {
-      return value.toString();
-    }
-    return value;
-  });
-
-export default App;

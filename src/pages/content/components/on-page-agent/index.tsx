@@ -1,10 +1,10 @@
 import { createRoot } from "react-dom/client";
-import App from "@src/pages/content/components/expodium-helper/app";
-import refreshOnUpdate from "virtual:reload-on-update-in-view";
+import App from "@src/pages/content/components/on-page-agent/app";
+
 const style = document.createElement("style");
 
 style.textContent = `
-    #expodium-root {
+    #eye-agent {
         position: fixed;
         width: 50px;
         height: 50px;
@@ -46,7 +46,7 @@ style.textContent = `
 document.head.append(style);
 
 const root = document.createElement("div");
-root.id = "expodium-root";
+root.id = "eye-agent";
 
 document.body.prepend(root);
 

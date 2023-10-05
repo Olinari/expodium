@@ -1,5 +1,4 @@
 import { IApiProvider, ApiProvider } from "../api-provider";
-import { getEncodedHtmlObject } from "@pages/content/components/expodium-helper/cleanup-html";
 
 interface IOpenAIService {
   transcribeAudio: (audioBlob: Blob) => Promise<string>;
@@ -13,11 +12,6 @@ interface IOpenAIService {
     actions: string;
   }) => Promise<any>;
   getEmbedding: ({ input }: { input: string }) => Promise<number[]>;
-  explainCode: ({
-    code,
-  }: {
-    code: string;
-  }) => Promise<{ title: string; description: string }>;
 }
 
 export class OpenAIService implements IOpenAIService {
@@ -58,7 +52,7 @@ export class OpenAIService implements IOpenAIService {
         {
           role: "system",
           content:
-            "You are an assistant that generates code snippets for the blind to surf the internet. Take into account the provided HTML, the JSON of functions, and the user's voice transcription. respond ONLY with an object of this structrue {key,args} where the key is the key of the correct answer function, and the args is a array of argument values declared in the function. a js object of the structure {key:string/*name of a function*/,args:string[]} and no more words.",
+            "You are an assistant that generates code snippets for the blind to surf the internet. Take a the JSON of functions, and the user's voice transcription. respond ONLY with an object of this structrue {key,args} where the key is the key of the correct answer function, and the args is a array of argument values declared in the function. a js object of the structure {key:string/*name of a function*/,args:string[]} and no more words.",
         },
         {
           role: "system",
@@ -115,23 +109,4 @@ export class OpenAIService implements IOpenAIService {
 
     return segments;
   }
-
-  summarizePage = async (): Promise<{ title: string; description: string }> => {
-    const code = getEncodedHtmlObject();
-
-    const response = await this.api.post("/v1/chat/completions", {
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        {
-          role: "user",
-          content:
-            "Imagine this structure represents an html site. summarize its contents for a blind person please please" +
-            JSON.stringify(code),
-        },
-      ],
-      model: "gpt-4",
-    });
-
-    return JSON.parse(response.choices?.[0].message.content);
-  };
 }
