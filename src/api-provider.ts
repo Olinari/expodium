@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 
 export interface IApiProvider {
   get: (path: string) => Promise<any>;
-  post: (path: string, payload: any) => Promise<any>;
+  post: (path: string, payload?: any) => Promise<any>;
   put: (path: string, payload: any) => Promise<any>;
   delete: (path: string) => Promise<any>;
   search?: (path: string, searchTerm: string) => Promise<any>;

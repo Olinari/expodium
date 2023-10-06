@@ -1,5 +1,3 @@
-import pako from "pako";
-
 export function dataURLtoBlob(dataurl) {
   var arr = dataurl.split(","),
     mime = arr[0].match(/:(.*?);/)[1],
@@ -13,20 +11,25 @@ export function dataURLtoBlob(dataurl) {
   return new Blob([u8arr], { type: mime });
 }
 
-export async function compressBlob(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(blob);
-    reader.onloadend = function () {
-      try {
-        const compressed = pako.deflate(reader.result);
-        resolve(new Blob([compressed]));
-      } catch (err) {
-        reject(err);
-      }
+export function minifyPng(dataUrl: string, factor: number) {
+  return new Promise<string>((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+
+    img.onload = function () {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width / factor;
+      canvas.height = img.height / factor;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const resizedDataUrl = canvas.toDataURL("image/png");
+      resolve(resizedDataUrl);
     };
-    reader.onerror = function () {
-      reject(new Error("Failed to read blob."));
+
+    img.onerror = function () {
+      reject(new Error("Failed to load image for resizing."));
     };
   });
 }

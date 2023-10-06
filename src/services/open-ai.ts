@@ -88,7 +88,6 @@ export class OpenAIService implements IOpenAIService {
     const segments: string[] = [];
     let currentSegment = "";
     let tokenCount = 0;
-    console.log({ html });
     // Split the HTML into words/tags and iterate through them
     const parts = html.split(/\s+/);
     for (const part of parts) {

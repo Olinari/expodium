@@ -2,11 +2,11 @@ import { useRef, useState } from "react";
 import { OpenAIService } from "@src/services/open-ai";
 const { transcribeAudio } = new OpenAIService();
 
-export const VoiceControl = ({
-  onVoiceInput,
-}: {
-  onInput: (text: string) => void;
-}) => {
+interface VoiceControlProps {
+  onVoiceInput: (text: string) => void;
+}
+
+export const VoiceControl = ({ onVoiceInput }: VoiceControlProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -29,7 +29,7 @@ export const VoiceControl = ({
     setIsRecording(true);
   };
 
-  const stopRecording = (onVoiceInput) => {
+  const stopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);

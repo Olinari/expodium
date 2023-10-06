@@ -6,9 +6,13 @@ reloadOnUpdate("pages/content/style.scss");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "captureScreenshot") {
-    chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-      sendResponse({ status: "success", dataUrl: dataUrl.toString() });
-    });
+    chrome.tabs.captureVisibleTab(
+      null,
+      { format: "jpeg", quality: 80 },
+      (dataUrl) => {
+        sendResponse({ status: "success", dataUrl: dataUrl.toString() });
+      }
+    );
     return true;
   }
 });

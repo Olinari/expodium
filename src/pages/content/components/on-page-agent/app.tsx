@@ -2,7 +2,7 @@ import { actions } from "@pages/content/components/on-page-agent/actions";
 import { OpenAIService } from "@src/services/open-ai";
 import { VoiceControl } from "@pages/content/components/on-page-agent/voice-control";
 import {
-  ScreenShotContext,
+  ScreenShotProvider,
   useScreenShotContext,
 } from "@pages/content/components/on-page-agent/screenshot-context";
 
@@ -10,9 +10,9 @@ const openAIServiceInstance = new OpenAIService();
 
 export default function App() {
   return (
-    <ScreenShotContext>
+    <ScreenShotProvider>
       <VoiceControlComponent />
-    </ScreenShotContext>
+    </ScreenShotProvider>
   );
 }
 
