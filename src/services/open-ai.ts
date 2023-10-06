@@ -39,7 +39,7 @@ export class OpenAIService implements IOpenAIService {
     return response?.text;
   };
 
-  generateCodeFromText = async ({
+  getActionFromText = async ({
     transcription,
     actions,
   }: {

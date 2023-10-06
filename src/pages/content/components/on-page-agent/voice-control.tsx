@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { OpenAIService } from "@src/services/open-ai";
 const { transcribeAudio } = new OpenAIService();
 
-export const VoiceToText = ({
-  onInput,
+export const VoiceControl = ({
+  onVoiceInput,
 }: {
   onInput: (text: string) => void;
 }) => {
@@ -21,7 +21,7 @@ export const VoiceToText = ({
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
       const text = await transcribeAudio(audioBlob);
-      onInput?.(text);
+      onVoiceInput?.(text);
       audioChunksRef.current = []; // Clear the chunks after using them
     };
 
@@ -29,7 +29,7 @@ export const VoiceToText = ({
     setIsRecording(true);
   };
 
-  const stopRecording = () => {
+  const stopRecording = (onVoiceInput) => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
@@ -41,7 +41,7 @@ export const VoiceToText = ({
       {isRecording ? (
         <button onClick={stopRecording}>Stop </button>
       ) : (
-        <button onClick={startRecording}>Start </button>
+        <button onClick={startRecording}>⬤ </button>
       )}
     </div>
   );

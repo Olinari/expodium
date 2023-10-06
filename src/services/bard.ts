@@ -17,13 +17,18 @@ export class BardService implements IBardService {
     image: File | Blob,
     prompt: string
   ): Promise<string> => {
+    console.log("analyze_image");
+    console.log(image);
     const formData = new FormData();
     formData.append("image", image);
     formData.append("prompt", prompt);
 
     try {
+      console.log("analyze_image");
+
       const response = await this.api.post("/analyze_image", formData);
-      return response?.text;
+
+      return response;
     } catch (error) {
       console.error("Error analyzing image:", error);
       throw error;
