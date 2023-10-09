@@ -1,12 +1,12 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { OpenAIService } from "@src/services/open-ai";
 const { transcribeAudio } = new OpenAIService();
 
 interface VoiceControlProps {
-  onVoiceInput: (text: string) => void;
+  onInput: (text: string) => void;
 }
 
-export const VoiceControl = ({ onVoiceInput }: VoiceControlProps) => {
+export const VoiceControl = ({ onInput }: VoiceControlProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -21,7 +21,7 @@ export const VoiceControl = ({ onVoiceInput }: VoiceControlProps) => {
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
       const text = await transcribeAudio(audioBlob);
-      onVoiceInput?.(text);
+      onInput?.(text);
       audioChunksRef.current = []; // Clear the chunks after using them
     };
 
@@ -36,13 +36,27 @@ export const VoiceControl = ({ onVoiceInput }: VoiceControlProps) => {
     }
   };
 
-  return (
-    <div>
-      {isRecording ? (
-        <button onClick={stopRecording}>Stop </button>
-      ) : (
-        <button onClick={startRecording}>⬤ </button>
-      )}
-    </div>
-  );
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.code === "Space" && !isRecording) {
+        startRecording();
+      }
+    };
+
+    const handleKeyUp = (event) => {
+      if (event.code === "Space" && isRecording) {
+        stopRecording();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isRecording]);
+
+  return null; // No UI element to render since it's all controlled by the space key
 };

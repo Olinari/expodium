@@ -1,18 +1,23 @@
-import { actions } from "@pages/content/components/on-page-agent/actions";
-import { OpenAIService } from "@src/services/open-ai";
-import { VoiceControl } from "@pages/content/components/on-page-agent/voice-control";
 import {
   ScreenShotProvider,
   useScreenShotContext,
-} from "@pages/content/components/on-page-agent/screenshot-context";
-
-const openAIServiceInstance = new OpenAIService();
+} from "@pages/content/components/on-page-agent/screen-shot/screenshot-context";
+import {
+  ChatProvider,
+  useChatContext,
+} from "@pages/content/components/on-page-agent/chat-provider";
+import { VoiceControl } from "@pages/content/components/on-page-agent/voice-control";
+import { actions } from "@pages/content/actions";
+import { OpenAIService } from "@src/services/open-ai";
+const openAi = new OpenAIService();
 
 export default function App() {
   return (
-    <ScreenShotProvider>
-      <VoiceControlComponent />
-    </ScreenShotProvider>
+    <ChatProvider>
+      <ScreenShotProvider>
+        <VoiceControlComponent />
+      </ScreenShotProvider>
+    </ChatProvider>
   );
 }
 
@@ -20,7 +25,7 @@ function VoiceControlComponent() {
   const { viewDescription } = useScreenShotContext();
 
   const handleVoiceCommand = async (text) => {
-    const { key, args } = await openAIServiceInstance.getActionFromText({
+    const { key, args } = await openAi.getActionFromText({
       transcription: text,
       actions: JSONstringifyWithFunctions(actions),
     });

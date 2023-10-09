@@ -3,7 +3,7 @@ import { IApiProvider, ApiProvider } from "../api-provider";
 interface IBardChat {
   create: () => Promise<IBardChat>;
   text: (message: string) => Promise<string>;
-  image: (image: File | Blob, prompt: string) => Promise<string>;
+  image: (image: File | Blob, prompt: string) => Promise<any>;
   end: () => Promise<string>;
 }
 
@@ -40,7 +40,10 @@ export class BardService {
           console.error(error);
         }
       },
-      image: async (image: File | Blob, prompt: string): Promise<string> => {
+      image: async (
+        image: File | Blob,
+        prompt: string
+      ): Promise<{ audio: any; response: string }> => {
         const formData = new FormData();
         formData.append("type", "image");
         formData.append("image", image);
@@ -50,7 +53,7 @@ export class BardService {
           console.log(`user: ${prompt} +attached image`);
           const response = await this.api.post("/chat", formData);
           console.log(`bot: ${response}`);
-          return response;
+          return response as { audio: any; response: string };
         } catch (error) {
           console.error(error);
         }
@@ -64,7 +67,7 @@ export class BardService {
             throw new Error("Failed to end session");
           }
         } catch (error) {
-          console.error(error);
+          console.log(error);
         }
       },
     };
