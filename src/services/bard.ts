@@ -34,7 +34,7 @@ export class BardService {
             type: "text",
             message: message,
           });
-          console.log(`bot: ${response}`);
+          console.log(response);
           return response;
         } catch (error) {
           console.error(error);
@@ -52,7 +52,7 @@ export class BardService {
         try {
           console.log(`user: ${prompt} +attached image`);
           const response = await this.api.post("/chat", formData);
-          console.log(`bot: ${response}`);
+          console.log(response);
           return response as { audio: any; response: string };
         } catch (error) {
           console.error(error);

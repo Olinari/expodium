@@ -1,11 +1,8 @@
 import {
   ScreenShotProvider,
   useScreenShotContext,
-} from "@pages/content/components/on-page-agent/screen-shot/screenshot-context";
-import {
-  ChatProvider,
-  useChatContext,
-} from "@pages/content/components/on-page-agent/chat-provider";
+} from "@pages/content/components/on-page-agent/screenshot-context";
+import { ChatProvider } from "@pages/content/components/on-page-agent/chat-provider";
 import { VoiceControl } from "@pages/content/components/on-page-agent/voice-control";
 import { actions } from "@pages/content/actions";
 import { OpenAIService } from "@src/services/open-ai";

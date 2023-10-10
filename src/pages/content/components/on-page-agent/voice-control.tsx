@@ -7,7 +7,6 @@ interface VoiceControlProps {
 }
 
 export const VoiceControl = ({ onInput }: VoiceControlProps) => {
-  const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -17,6 +16,17 @@ export const VoiceControl = ({ onInput }: VoiceControlProps) => {
     mediaRecorderRef.current.ondataavailable = (event) => {
       audioChunksRef.current.push(event.data);
     };
+
+    const stopRecording = () => {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+      }
+    };
+    const [_, setIsRecording] = useRecorderController(
+      startRecording,
+      stopRecording
+    );
 
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current);
@@ -29,13 +39,11 @@ export const VoiceControl = ({ onInput }: VoiceControlProps) => {
     setIsRecording(true);
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
+  return null;
+};
 
+const useRecorderController = (startRecording, stopRecording) => {
+  const [isRecording, setIsRecording] = useState(false);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.code === "Space" && !isRecording) {
@@ -58,5 +66,5 @@ export const VoiceControl = ({ onInput }: VoiceControlProps) => {
     };
   }, [isRecording]);
 
-  return null; // No UI element to render since it's all controlled by the space key
+  return [isRecording, setIsRecording] as const;
 };
