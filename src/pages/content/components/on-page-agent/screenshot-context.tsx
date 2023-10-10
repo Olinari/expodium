@@ -3,7 +3,7 @@ import React, { createContext, ReactNode, useContext, useState } from "react";
 import { dataURLtoBlob, minifyPng } from "@src/utils/image-utils";
 import { useChatContext } from "@pages/content/components/on-page-agent/chat-provider";
 import { captureScreenshot } from "@src/utils/screenshot-utils";
-import { useScrollController } from "@pages/content/components/on-page-agent/navigation";
+import { useScrollController } from "@pages/content/components/on-page-agent/scroll-controllet";
 
 interface ScreenShotContextType {
   viewDescription: string | null;
@@ -27,12 +27,13 @@ export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
 
   const { promptChatWithImage } = useChatContext();
 
-  const handleScreenShot = async ({ dataUrl }: { dataUrl: string }) => {
-    captureScreenshot(async () => {
+  const handleScreenShot = async (onScrollEnd?: () => void) => {
+    captureScreenshot(async ({ dataUrl }: { dataUrl: string }) => {
       const compressedData = await minifyPng(dataUrl, 3);
       const processedScreenshot = await dataURLtoBlob(compressedData);
       try {
-        promptChatWithImage(processedScreenshot, "audio");
+        await promptChatWithImage(processedScreenshot, "audio");
+        onScrollEnd?.();
       } catch (error) {
         console.error(error);
       }
