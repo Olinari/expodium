@@ -4,6 +4,8 @@ import { dataURLtoBlob, minifyPng } from "@src/utils/image-utils";
 import { useChatContext } from "@pages/content/components/on-page-agent/chat-provider";
 import { captureScreenshot } from "@src/utils/screenshot-utils";
 import { useScrollController } from "@pages/content/components/on-page-agent/scroll-controllet";
+import { DoctrService } from "@src/services/doctr";
+import { useUiHelpersContext } from "@pages/content/components/on-page-agent/ui-helpers-context";
 
 interface ScreenShotContextType {
   viewDescription: string | null;
@@ -24,15 +26,23 @@ export const useScreenShotContext = (): ScreenShotContextType => {
 
 export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
   const [viewDescription, setViewDescription] = useState<string | null>(null);
-
   const { promptChatWithImage } = useChatContext();
+
+  const { analyzeImage } = new DoctrService();
+
+  const { updateUiHelperControls } = useUiHelpersContext();
 
   const handleScreenShot = async (onScrollEnd?: () => void) => {
     captureScreenshot(async ({ dataUrl }: { dataUrl: string }) => {
-      const compressedData = await minifyPng(dataUrl, 3);
+      const compressedData = await minifyPng(dataUrl, 2);
       const processedScreenshot = await dataURLtoBlob(compressedData);
+
       try {
-        await promptChatWithImage(processedScreenshot, "audio");
+        const imageData = await analyzeImage(processedScreenshot);
+
+        updateUiHelperControls(imageData);
+        //await await promptChatWithImage(processedScreenshot, "text");
+
         onScrollEnd?.();
       } catch (error) {
         console.error(error);

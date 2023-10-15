@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { BardService } from "@src/services/bard";
 import { getPageDetails } from "@src/utils/webpage-utils";
+import { loadAudio, playAudio } from "@src/utils/audio-utils";
 
 const Bard = new BardService();
 type ResponseType = "audio" | "text";
@@ -35,10 +36,10 @@ export function ChatProvider({ children }: ChatProviderProps) {
     response: ResponseType
   ) => {
     try {
-      const loadingAudioPath = await loadAudio();
+      const loadingAudioPath = await loadAudio("please-wait.m4a");
       if (loadingAudioPath) {
         //avoid await here to prevent delaying the fetch
-        playAudio(loadingAudioPath);
+        //playAudio(loadingAudioPath);
       }
 
       const { audio, response: text } = await Bard.chat.image(
@@ -48,6 +49,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       if (response === "audio") {
         await playAudio(audio);
       } else if (response === "text") {
+        console.log(text);
         return text;
       }
       return null;
@@ -73,34 +75,4 @@ const getExplainScreenShotPrompt = () => {
   } else {
     return `Scrolled:${pageDetails["Scroll Percentage"]}%  Describe in 250 characters the UI in this screenshot in simple words, briefly describing the content, and list main actions. Be as brief and concise as possible. Make sure every reference you make is **actually in the UI** and that you have covered all the content and components on the screen. To avoid confusion please respond with ***only the description***`;
   }
-};
-
-async function loadAudio() {
-  try {
-    const audioPath = chrome.runtime.getURL("Untitled.m4a");
-
-    const response = await fetch(audioPath);
-    const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
-    return audioUrl;
-  } catch (error) {
-    console.error("Error loading audio:", error);
-    return null;
-  }
-}
-
-const playAudio = (audio) => {
-  return new Promise((resolve, reject) => {
-    const audioObject = new Audio(audio);
-
-    audioObject.onended = () => {
-      resolve(null);
-    };
-
-    audioObject.onerror = (error) => {
-      reject(error);
-    };
-
-    audioObject.play();
-  });
 };

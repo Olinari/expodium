@@ -1,16 +1,7 @@
 import { IApiProvider, ApiProvider } from "../api-provider";
 
-interface IOpenAIService {
+export interface IOpenAIService {
   transcribeAudio: (audioBlob: Blob) => Promise<string>;
-  generateCodeFromText: ({
-    transcription,
-    html,
-    actions,
-  }: {
-    transcription: string;
-    html: string;
-    actions: string;
-  }) => Promise<any>;
   getEmbedding: ({ input }: { input: string }) => Promise<number[]>;
 }
 
@@ -80,32 +71,4 @@ export class OpenAIService implements IOpenAIService {
 
     return response.data[0].embedding as number[];
   };
-
-  private async segmentHtmlByTokens(
-    html: string,
-    maxTokens = 8000
-  ): Promise<string[]> {
-    const segments: string[] = [];
-    let currentSegment = "";
-    let tokenCount = 0;
-    // Split the HTML into words/tags and iterate through them
-    const parts = html.split(/\s+/);
-    for (const part of parts) {
-      const partTokens = part.length; // Rough estimate of tokens. A more precise method might be needed.
-
-      if (tokenCount + partTokens > maxTokens) {
-        segments.push(currentSegment.trim());
-        currentSegment = "";
-        tokenCount = 0;
-      }
-
-      currentSegment += part + " ";
-      tokenCount += partTokens;
-    }
-    if (currentSegment.trim()) {
-      segments.push(currentSegment.trim());
-    }
-
-    return segments;
-  }
 }

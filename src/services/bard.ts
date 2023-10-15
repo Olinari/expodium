@@ -72,21 +72,4 @@ export class BardService {
       },
     };
   }
-  analyzeImage = async (
-    image: File | Blob,
-    prompt: string
-  ): Promise<string> => {
-    console.log("analyze_image", { image });
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append("prompt", prompt);
-
-    try {
-      console.log("Analyzing image...");
-      const response = await this.api.post("/analyze_image", formData);
-      return response;
-    } catch (error) {
-      console.error("Error analyzing image:", error);
-    }
-  };
 }

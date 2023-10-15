@@ -100,7 +100,7 @@ const manifest: chrome.runtime.ManifestV3 = {
         "assets/css/*.css",
         "icon-128.png",
         "icon-34.png",
-        "Untitled.m4a",
+        "please-wait.m4a",
       ],
       matches: ["*://*/*"],
     },

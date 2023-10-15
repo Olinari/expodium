@@ -16,9 +16,9 @@ export function useScrollController(onscroll: (any) => void) {
   };
 
   const handleKeyPress = async (event: KeyboardEvent) => {
-    event.preventDefault();
     if (isScrolling) return;
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
       setIsScrolling(true);
 
       if (event.key === "ArrowDown") {

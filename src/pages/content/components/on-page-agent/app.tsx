@@ -6,15 +6,18 @@ import { ChatProvider } from "@pages/content/components/on-page-agent/chat-provi
 import { VoiceControl } from "@pages/content/components/on-page-agent/voice-control";
 import { actions } from "@pages/content/actions";
 import { OpenAIService } from "@src/services/open-ai";
+import { UiHelpersProvider } from "@pages/content/components/on-page-agent/ui-helpers-context";
 const openAi = new OpenAIService();
 
 export default function App() {
   return (
-    <ChatProvider>
-      <ScreenShotProvider>
-        <VoiceControlComponent />
-      </ScreenShotProvider>
-    </ChatProvider>
+    <UiHelpersProvider>
+      <ChatProvider>
+        <ScreenShotProvider>
+          <VoiceControlComponent />
+        </ScreenShotProvider>
+      </ChatProvider>
+    </UiHelpersProvider>
   );
 }
 

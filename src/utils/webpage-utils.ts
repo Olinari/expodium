@@ -1,10 +1,10 @@
+const getMetaContent = (name: string) => {
+  const element = document.querySelector(`meta[name='${name}']`);
+  return element ? element.getAttribute("content") : null;
+};
+
 export const getPageDetails = () => {
   const pageTitle = document.title;
-
-  const getMetaContent = (name: string) => {
-    const element = document.querySelector(`meta[name='${name}']`);
-    return element ? element.getAttribute("content") : null;
-  };
   const scrollTop =
     document.documentElement.scrollTop || document.body.scrollTop;
   const metaTitle = getMetaContent("title");
@@ -27,3 +27,22 @@ export const getPageDetails = () => {
     "Scroll Percentage": `${scrollPercentage || "Not available"}`,
   };
 };
+
+export function getByText(text, node = document.body) {
+  const textNodes = Array.from(node.querySelectorAll("*")).filter(
+    (el: HTMLElement) =>
+      el.textContent.includes(text) || text.includes(el.textContent)
+  );
+
+  if (textNodes.length === 0) {
+    console.error(`No node found with text: ${text}`);
+    return;
+  }
+
+  if (textNodes.length > 1) {
+    console.error(`Multiple nodes found with text: ${text}`);
+    return;
+  }
+
+  return textNodes[0];
+}
