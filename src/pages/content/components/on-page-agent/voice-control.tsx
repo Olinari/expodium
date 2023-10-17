@@ -1,12 +1,14 @@
 import { useRef, useState, useEffect } from "react";
 import { OpenAIService } from "@src/services/open-ai";
+import { useScreenShotContext } from "@pages/content/components/on-page-agent/screenshot-context";
+import { actions } from "@pages/content/actions";
 const { transcribeAudio } = new OpenAIService();
 
 interface VoiceControlProps {
   onInput: (text: string) => void;
 }
 
-export const VoiceControl = ({ onInput }: VoiceControlProps) => {
+const VoiceControlComponent = ({ onInput }: VoiceControlProps) => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -68,3 +70,19 @@ const useRecorderController = (startRecording, stopRecording) => {
 
   return [isRecording, setIsRecording] as const;
 };
+
+export function VoiceControl() {
+  const { viewDescription } = useScreenShotContext();
+  const openAi = new OpenAIService();
+
+  const handleVoiceCommand = async (text) => {
+    const { key, args } = await openAi.getActionFromText({
+      transcription: text,
+      actions: JSONstringifyWithFunctions(actions),
+    });
+
+    actions[key](viewDescription, ...args);
+  };
+
+  return <VoiceControlComponent onInput={handleVoiceCommand} />;
+}

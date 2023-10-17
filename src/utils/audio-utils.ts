@@ -24,6 +24,6 @@ export const playAudio = (audio) => {
       reject(error);
     };
 
-    audioObject.play();
+    /*    audioObject.play();*/
   });
 };

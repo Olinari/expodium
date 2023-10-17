@@ -39,7 +39,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       const loadingAudioPath = await loadAudio("please-wait.m4a");
       if (loadingAudioPath) {
         //avoid await here to prevent delaying the fetch
-        //playAudio(loadingAudioPath);
+        playAudio(loadingAudioPath);
       }
 
       const { audio, response: text } = await Bard.chat.image(

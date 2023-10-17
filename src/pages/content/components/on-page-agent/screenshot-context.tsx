@@ -41,7 +41,7 @@ export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
         const imageData = await analyzeImage(processedScreenshot);
 
         updateUiHelperControls(imageData);
-        //await await promptChatWithImage(processedScreenshot, "text");
+        await promptChatWithImage(processedScreenshot, "audio");
 
         onScrollEnd?.();
       } catch (error) {

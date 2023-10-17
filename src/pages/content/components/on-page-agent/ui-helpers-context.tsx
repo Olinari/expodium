@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import _ from "lodash";
 
 interface UiHelpersContextType {
   updateUiHelperControls: (data: any) => void;
@@ -18,10 +19,19 @@ interface UiHelpersProviderProps {
 
 export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const [elementsData, setElements] = useState([]);
+  const [selectedElementIndex, setSelctedElementIndex] = useState(0);
 
   const updateUiHelperControls = (data: any) => {
-    // Update state with new image data (predictions)
-    setElements(data);
+    setElements(
+      reduce(
+        data.sort((a, b) => {
+          if (a.x !== b.x) {
+            return a.x - b.x; // sort by x first (left to right)
+          }
+          return a.y - b.y; // then sort by y (top to bottom)
+        })
+      )
+    );
   };
 
   const offset = 8 as const;
@@ -29,16 +39,21 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   return (
     <UiHelpersContext.Provider value={{ updateUiHelperControls }}>
       <>
-        {elementsData.map((pred, index) => {
-          const width = offset + pred.width;
-          const height = offset + pred.height;
-          const top = pred.y - 0.5 * pred.height - offset / 2;
-          const left = pred.x - 0.5 * pred.width - offset / 2;
+        {elementsData.map((element, index) => {
+          console.log(selectedElementIndex, index);
+          const width = offset + element.width;
+          const height = offset + element.height;
+          const top = element.y - 0.5 * element.height - offset / 2;
+          const left = element.x - 0.5 * element.width - offset / 2;
           return (
             <div
+              onClick={() => console.log(element.id)}
               key={index}
               style={{
-                border: "2px solid red",
+                border:
+                  selectedElementIndex === index
+                    ? "2px solid blue"
+                    : "2px solid red",
                 position: "absolute",
                 top: `${top}px`,
                 left: `${left}px`,
@@ -46,7 +61,8 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
                 height: `${height}px`,
                 zIndex: 10000,
               }}
-              data-element={pred.class}
+              data-index={element.id}
+              data-element={element.class}
             />
           );
         })}
@@ -54,4 +70,47 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
       {children}
     </UiHelpersContext.Provider>
   );
+};
+
+function calculateOverlap(a, b) {
+  const x_overlap = Math.max(
+    0,
+    Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)
+  );
+  const y_overlap = Math.max(
+    0,
+    Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y)
+  );
+  const overlapArea = x_overlap * y_overlap;
+  return overlapArea / (a.width * a.height);
+}
+
+function mergeRectangles(a, b) {
+  return {
+    class: a.class + "|" + b.class,
+    class_id: Math.random() * 123,
+    confidence: Math.max(a.confidence, b.confidence), // Taking the max confidence for simplicity
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x),
+    height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y),
+    id: a.id,
+  };
+}
+
+const reduce = (data) => {
+  const reducedData = [...data];
+  for (let i = 0; i < reducedData.length; i++) {
+    reducedData[i].index = _.uniqueId;
+    for (let j = i + 1; j < reducedData.length; j++) {
+      if (calculateOverlap(reducedData[i], reducedData[j]) > 0.8) {
+        const merged = mergeRectangles(reducedData[i], reducedData[j]);
+        reducedData[i] = merged; // Replace i-th obj with merged obj
+        reducedData.splice(j, 1); // Remove j-th obj
+        j--; // Decrement j so the loop correctly processes the next item
+      }
+    }
+  }
+
+  return reducedData;
 };
