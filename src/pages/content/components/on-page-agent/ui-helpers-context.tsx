@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import _ from "lodash";
+import { getMostOverlappedElement } from "@src/utils/webpage-utils";
 
 interface UiHelpersContextType {
   updateUiHelperControls: (data: any) => void;
@@ -24,12 +25,11 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const updateUiHelperControls = (data: any) => {
     setElements(
       reduce(
-        data.sort((a, b) => {
-          if (a.x !== b.x) {
-            return a.x - b.x; // sort by x first (left to right)
-          }
-          return a.y - b.y; // then sort by y (top to bottom)
-        })
+        data
+          .sort((a, b) => {
+            return a.y - b.y; // sort by x first (left to right)
+          })
+          .sort((a, b) => a.x - b.x)
       )
     );
   };
@@ -47,7 +47,17 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
           const left = element.x - 0.5 * element.width - offset / 2;
           return (
             <div
-              onClick={() => console.log(element.id)}
+              onClick={() =>
+                console.log(
+                  getMostOverlappedElement(
+                    left,
+                    top,
+                    width,
+                    height,
+                    element.tag
+                  )
+                )
+              }
               key={index}
               style={{
                 border:
@@ -61,6 +71,7 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
                 height: `${height}px`,
                 zIndex: 10000,
               }}
+              data-slicerra={true}
               data-index={element.id}
               data-element={element.class}
             />
@@ -88,7 +99,7 @@ function calculateOverlap(a, b) {
 function mergeRectangles(a, b) {
   return {
     class: a.class + "|" + b.class,
-    class_id: Math.random() * 123,
+
     confidence: Math.max(a.confidence, b.confidence), // Taking the max confidence for simplicity
     x: Math.min(a.x, b.x),
     y: Math.min(a.y, b.y),
@@ -107,7 +118,7 @@ const reduce = (data) => {
         const merged = mergeRectangles(reducedData[i], reducedData[j]);
         reducedData[i] = merged; // Replace i-th obj with merged obj
         reducedData.splice(j, 1); // Remove j-th obj
-        j--; // Decrement j so the loop correctly processes the next item
+        j--;
       }
     }
   }

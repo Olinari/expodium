@@ -46,3 +46,41 @@ export function getByText(text, node = document.body) {
 
   return textNodes[0];
 }
+
+export function getMostOverlappedElement(x, y, width, height, tag) {
+  const rectArea = width * height;
+
+  let maxScore = -Infinity;
+  let mostOverlappedElement = null;
+
+  // Get all elements within the bounding rectangle
+  const elements = document.elementsFromPoint(x + width / 2, y + height / 2);
+
+  for (const el of elements) {
+    const elRect = el.getBoundingClientRect();
+
+    const x_overlap = Math.max(
+      0,
+      Math.min(x + width, elRect.right) - Math.max(x, elRect.left)
+    );
+    const y_overlap = Math.max(
+      0,
+      Math.min(y + height, elRect.bottom) - Math.max(y, elRect.top)
+    );
+
+    const overlapArea = x_overlap * y_overlap;
+    const elArea = elRect.width * elRect.height;
+    const sizeDifference = Math.abs(rectArea - elArea);
+
+    // Calculate a score which is the overlap area minus a penalty for size difference
+    const score = overlapArea - sizeDifference * 0.1;
+
+    if (score > maxScore && !el.getAttribute("data-slicerra")) {
+      maxScore = score;
+      mostOverlappedElement = el;
+      el.setAttribute("data-element-type", tag);
+    }
+  }
+
+  return mostOverlappedElement;
+}
