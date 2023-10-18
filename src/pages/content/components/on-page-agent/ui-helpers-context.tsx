@@ -38,6 +38,8 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const navigate = useCallback(
     (event) => {
       let [row, col] = selectedElementIndex;
+      console.log(elementsData);
+      const element = elementsData[row][col];
 
       switch (event.key) {
         case "a": // Left
@@ -53,6 +55,18 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
         case "w": // Up
           row = Math.max(0, row - 1);
           col = Math.min(elementsData[row].length - 1, col); // adjust column if the previous row has fewer items
+          break;
+
+        case "Enter":
+          console.log(
+            getMostOverlappedElement(
+              element.x - 0.5 * element.width,
+              element.y - 0.5 * element.height,
+              element.width,
+              element.height,
+              element.tag
+            )
+          );
           break;
         default:
           return; // If other keys are pressed, don't do anything
@@ -79,24 +93,13 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
             const left = element.x - 0.5 * element.width - offset / 2;
             return (
               <div
-                onClick={() =>
-                  console.log(
-                    getMostOverlappedElement(
-                      left,
-                      top,
-                      width,
-                      height,
-                      element.tag
-                    )
-                  )
-                }
                 key={`${x}-${y}`}
                 style={{
                   border:
                     selectedElementIndex[0] === y &&
                     selectedElementIndex[1] === x
                       ? "2px solid blue"
-                      : "2px solid transparentw",
+                      : "2px solid transparent",
                   position: "absolute",
                   top: `${top}px`,
                   left: `${left}px`,

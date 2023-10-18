@@ -48,6 +48,7 @@ export function getByText(text, node = document.body) {
 }
 
 export function getMostOverlappedElement(x, y, width, height, tag) {
+  console.log(x, y, width, height, tag);
   const rectArea = width * height;
 
   let maxScore = -Infinity;
