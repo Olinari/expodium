@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import _ from "lodash";
 import { getMostOverlappedElement } from "@src/utils/webpage-utils";
+import { capturePartialScreenshot } from "@src/utils/screenshot-utils";
 
 interface UiHelpersContextType {
   updateUiHelperControls: (data: any) => void;
@@ -58,14 +59,21 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
           break;
 
         case "Enter":
-          console.log(
-            getMostOverlappedElement(
-              element.x - 0.5 * element.width,
-              element.y - 0.5 * element.height,
-              element.width,
-              element.height,
-              element.tag
-            )
+          getMostOverlappedElement(
+            element.x - 0.5 * element.width,
+            element.y - 0.5 * element.height,
+            element.width,
+            element.height,
+            element.tag
+          );
+          capturePartialScreenshot(
+            {
+              x: element.x,
+              y: element.y,
+              width: element.width * 2,
+              height: element.height * 2,
+            },
+            (response) => console.log(response)
           );
           break;
         default:

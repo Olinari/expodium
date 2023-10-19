@@ -19,6 +19,7 @@ export class BardService {
     this.chat = {
       create: async (): Promise<IBardChat> => {
         const response = await this.api.post("/start_session");
+
         if (response.ok) {
           console.log("chat initialized!");
           return this.chat;
