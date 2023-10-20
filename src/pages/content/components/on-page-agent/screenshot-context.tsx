@@ -36,7 +36,7 @@ export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
   const handleScreenShot = async (onScrollEnd?: () => void) => {
     captureScreenshot(async ({ dataUrl }: { dataUrl: string }) => {
       const compressedData = await minifyPng(dataUrl, 2);
-      const processedScreenshot = await dataURLtoBlob(compressedData);
+      const processedScreenshot = dataURLtoBlob(compressedData);
 
       try {
         const imageData = await analyzeImage(processedScreenshot);

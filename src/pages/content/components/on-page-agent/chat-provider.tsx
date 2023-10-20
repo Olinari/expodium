@@ -3,6 +3,7 @@ import { BardService } from "@src/services/bard";
 import { getHTMLElmentFromRect } from "@src/utils/webpage-utils";
 import { loadAudio, playAudio } from "@src/utils/audio-utils";
 import { capturePartialScreenshot } from "@src/utils/screenshot-utils";
+import { dataURLtoBlob } from "@src/utils/image-utils";
 
 const Bard = new BardService();
 type ResponseType = "audio" | "text";
@@ -82,8 +83,13 @@ export function ChatProvider({ children }: ChatProviderProps) {
         width: element.width * 2,
         height: element.height * 2,
       },
-      ({ dataUrl }) =>
-        promptChatWithImage(dataUrl, "What this button do?", "audio")
+      ({ dataUrl }) => {
+        promptChatWithImage(
+          dataURLtoBlob(dataUrl),
+          `What this button do? ${markup}`,
+          "audio"
+        );
+      }
     );
   };
 

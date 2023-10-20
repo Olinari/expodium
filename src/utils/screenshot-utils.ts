@@ -10,8 +10,7 @@ export const capturePartialScreenshot = (
 ) => {
   chrome.runtime.sendMessage(
     { action: "capturePartialScreenshot", rect: rect },
-    (response) => {
-      console.log(response);
+    async (response) => {
       onScreenshot(response);
     }
   );

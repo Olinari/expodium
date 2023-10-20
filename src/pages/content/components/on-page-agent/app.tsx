@@ -5,12 +5,12 @@ import { UiHelpersProvider } from "@pages/content/components/on-page-agent/ui-he
 
 export default function App() {
   return (
-    <UiHelpersProvider>
-      <ChatProvider>
+    <ChatProvider>
+      <UiHelpersProvider>
         <ScreenShotProvider>
           <VoiceControl />
         </ScreenShotProvider>
-      </ChatProvider>
-    </UiHelpersProvider>
+      </UiHelpersProvider>
+    </ChatProvider>
   );
 }

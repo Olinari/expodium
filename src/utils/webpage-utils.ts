@@ -1,4 +1,5 @@
 import { mergeRectangles } from "@src/utils/image-utils";
+import _ from "lodash";
 
 const getMetaContent = (name: string) => {
   const element = document.querySelector(`meta[name='${name}']`);
