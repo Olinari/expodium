@@ -1,3 +1,5 @@
+import { mergeRectangles } from "@src/utils/image-utils";
+
 const getMetaContent = (name: string) => {
   const element = document.querySelector(`meta[name='${name}']`);
   return element ? element.getAttribute("content") : null;
@@ -47,7 +49,7 @@ export function getByText(text, node = document.body) {
   return textNodes[0];
 }
 
-export function getMostOverlappedElement(x, y, width, height, tag) {
+export function getHTMLElmentFromRect(x, y, width, height, tag = "") {
   console.log(x, y, width, height, tag);
   const rectArea = width * height;
 
@@ -84,4 +86,61 @@ export function getMostOverlappedElement(x, y, width, height, tag) {
   }
 
   return mostOverlappedElement;
+}
+
+export function calculateOverlap(a, b) {
+  const x_overlap = Math.max(
+    0,
+    Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)
+  );
+  const y_overlap = Math.max(
+    0,
+    Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y)
+  );
+  const overlapArea = x_overlap * y_overlap;
+  return overlapArea / (a.width * a.height);
+}
+
+export const removeRedundatRects = (data) => {
+  const reducedData = [...data];
+  for (let i = 0; i < reducedData.length; i++) {
+    reducedData[i].index = _.uniqueId;
+    for (let j = i + 1; j < reducedData.length; j++) {
+      if (calculateOverlap(reducedData[i], reducedData[j]) > 0.8) {
+        const merged = mergeRectangles(reducedData[i], reducedData[j]);
+        reducedData[i] = merged; // Replace i-th obj with merged obj
+        reducedData.splice(j, 1); // Remove j-th obj
+        j--;
+      }
+    }
+  }
+
+  return reducedData;
+};
+
+export function sortIntoMatrix(points, deltaY = 40) {
+  // Sort primarily by y, then by x
+  points.sort((a, b) => a.y - b.y || a.x - b.x);
+
+  const rows = [];
+  let currentRow = [points[0]];
+
+  for (let i = 1; i < points.length; i++) {
+    if (Math.abs(points[i].y - points[i - 1].y) <= deltaY) {
+      currentRow.push(points[i]);
+    } else {
+      // Sort the current row by x-values before pushing to the rows array
+      currentRow.sort((a, b) => a.x - b.x);
+      rows.push(currentRow);
+      currentRow = [points[i]];
+    }
+  }
+
+  // Don't forget the last row
+  if (currentRow.length) {
+    currentRow.sort((a, b) => a.x - b.x);
+    rows.push(currentRow);
+  }
+
+  return rows;
 }
