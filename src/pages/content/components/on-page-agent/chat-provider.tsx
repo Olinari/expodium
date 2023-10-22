@@ -69,7 +69,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       element.width,
       element.height,
       element.tag
-    );
+    ).innerHTML;
     capturePartialScreenshot(
       {
         x: element.x * 2 - element.width,
@@ -95,7 +95,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
    
           }
           
-         This time respond only with the json. no text before, no text after. avoid Template literals and string interpolation your response is my data 
+         This time respond only with the json. no text before, no text after. no summaries. JUST THE JSON. your response is my data 
    `,
           "audio"
         );
