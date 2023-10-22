@@ -18,6 +18,13 @@ const UiHelpersContext = createContext<UiHelpersContextType | undefined>(
   undefined
 );
 
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export const useUiHelpersContext = (): UiHelpersContextType => {
   return useContext(UiHelpersContext);
 };
@@ -41,8 +48,10 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const navigate = useCallback(
     (event) => {
       let [row, col] = selectedElementIndex;
-      console.log(elementsData);
+
       const element = elementsData[row][col];
+
+      console.log(event.key);
 
       switch (event.key) {
         case "a": // Left
@@ -65,7 +74,7 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
 
           break;
         default:
-          return; // If other keys are pressed, don't do anything
+          return;
       }
 
       setSelctedElementIndex([row, col]);

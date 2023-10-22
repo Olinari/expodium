@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { BardService } from "@src/services/bard";
 import { getHTMLElmentFromRect } from "@src/utils/webpage-utils";
-import { loadAudio, playAudio } from "@src/utils/audio-utils";
+import { playAudio } from "@src/utils/audio-utils";
 import { capturePartialScreenshot } from "@src/utils/screenshot-utils";
 import { dataURLtoBlob } from "@src/utils/image-utils";
 
@@ -49,12 +49,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
     response: ResponseType
   ) => {
     try {
-      const loadingAudioPath = await loadAudio("please-wait.m4a");
-      if (loadingAudioPath) {
-        //avoid await here to prevent delaying the fetch
-        playAudio(loadingAudioPath);
-      }
-
       const { audio, response: text } = await Bard.chat.image(image, prompt);
       if (response === "audio") {
         await playAudio(audio);
@@ -78,15 +72,31 @@ export function ChatProvider({ children }: ChatProviderProps) {
     );
     capturePartialScreenshot(
       {
-        x: element.x,
-        y: element.y,
+        x: element.x * 2 - element.width,
+        y: element.y * 2 - element.height,
         width: element.width * 2,
         height: element.height * 2,
       },
       ({ dataUrl }) => {
+        console.log(dataUrl, markup);
         promptChatWithImage(
           dataURLtoBlob(dataUrl),
-          `What this button do? ${markup}`,
+          `The attached image and the following HTML are representing an element on the page I've previously sent. respond ***ONLY***
+          .with the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you.
+          markup:${markup}
+          Fil in this JSON:
+          {
+          componentType: //The HTML component e.g div or button,
+          description: //200 chars max what is the purpose of this element?,
+          actions://what action are possible on this div. options are :['click','input','navigate']
+          }:{
+          componentType:string,
+          description:string,
+   
+          }
+          
+         This time respond only with the json. no text before, no text after. avoid Template literals and string interpolation your response is my data 
+   `,
           "audio"
         );
       }
