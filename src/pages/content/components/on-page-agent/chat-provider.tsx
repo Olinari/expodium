@@ -1,12 +1,10 @@
 import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { BardService } from "@src/services/bard";
-import { getHTMLElmentFromRect } from "@src/utils/webpage-utils";
 import { playAudio } from "@src/utils/audio-utils";
 import { capturePartialScreenshot } from "@src/utils/screenshot-utils";
 import { dataURLtoBlob } from "@src/utils/image-utils";
 
 const Bard = new BardService();
-type ResponseType = "audio" | "text";
 
 interface Rect {
   x: number;
@@ -17,11 +15,10 @@ interface Rect {
 
 interface ChatContextType {
   chat: typeof Bard.chat;
-  promptChatWithElement: (element: Rect) => void;
+  promptChatWithElement: (element: Rect, markup: string) => void;
   promptChatWithImage: (
-    image: any,
-    prompt: string,
-    response: ResponseType
+    image: Blob | File,
+    prompt: string
   ) => Promise<string | null>;
 }
 
@@ -35,77 +32,68 @@ export const useChatContext = (): ChatContextType => {
   return useContext(ChatContext);
 };
 
+const initializeChat = () => {
+  Bard.chat.create();
+};
+
+const terminateChat = () => {
+  Bard.chat.end();
+};
+
+const sendImageToChat = async (image: File | Blob, prompt: string) => {
+  try {
+    const { audio, response: text } = await Bard.chat.image(image, prompt);
+    await playAudio(audio);
+    return text;
+  } catch (error) {
+    console.error(error);
+    return null; // Return null or some default value in case of an error
+  }
+};
+
+const captureAndChatWithElement = (rect, markup) => {
+  return new Promise((resolve, reject) => {
+    capturePartialScreenshot(rect, ({ dataUrl }) => {
+      sendImageToChat(dataURLtoBlob(dataUrl), createPrompt(markup))
+        .then((textResponse) => {
+          resolve(textResponse);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  });
+};
+
+const createPrompt = (markup: string) => {
+  return `The attached image and the following HTML are representing an element on the page I've previously sent. respond ***ONLY***
+          .with the following JSON, filled with accurate data. Double check that any data you fill in corresponds with the images I sent you.
+          markup: ${markup}
+          Fill in this JSON:
+          {
+            componentType: //The HTML component e.g div or button,
+            description: //200 chars max what is the purpose of this element?,
+            actions://what action are possible on this div. options are :['click','input','navigate']
+          }:{
+            componentType:string,
+            description:string,
+          }
+          This time respond only with the json. No text before, no text after. No summaries. JUST THE JSON. Your response is my data.`;
+};
+
 export function ChatProvider({ children }: ChatProviderProps) {
   useEffect(() => {
-    Bard.chat.create();
-    return () => {
-      Bard.chat.end();
-    };
+    initializeChat();
+    return terminateChat;
   }, []);
-
-  const promptChatWithImage = async (
-    image: File | Blob,
-    prompt: string,
-    response: ResponseType
-  ) => {
-    try {
-      const { audio, response: text } = await Bard.chat.image(image, prompt);
-      if (response === "audio") {
-        await playAudio(audio);
-      } else if (response === "text") {
-        console.log(text);
-        return text;
-      }
-      return null;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const promptChatWithElement = (element: Rect & { tag?: string }) => {
-    const markup = getHTMLElmentFromRect(
-      element.x - 0.5 * element.width,
-      element.y - 0.5 * element.height,
-      element.width,
-      element.height,
-      element.tag
-    ).innerHTML;
-    capturePartialScreenshot(
-      {
-        x: element.x * 2 - element.width,
-        y: element.y * 2 - element.height,
-        width: element.width * 2,
-        height: element.height * 2,
-      },
-      ({ dataUrl }) => {
-        console.log(dataUrl, markup);
-        promptChatWithImage(
-          dataURLtoBlob(dataUrl),
-          `The attached image and the following HTML are representing an element on the page I've previously sent. respond ***ONLY***
-          .with the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you.
-          markup:${markup}
-          Fil in this JSON:
-          {
-          componentType: //The HTML component e.g div or button,
-          description: //200 chars max what is the purpose of this element?,
-          actions://what action are possible on this div. options are :['click','input','navigate']
-          }:{
-          componentType:string,
-          description:string,
-   
-          }
-          
-         This time respond only with the json. no text before, no text after. no summaries. JUST THE JSON. your response is my data 
-   `,
-          "audio"
-        );
-      }
-    );
-  };
 
   return (
     <ChatContext.Provider
-      value={{ chat: Bard.chat, promptChatWithImage, promptChatWithElement }}
+      value={{
+        chat: Bard.chat,
+        promptChatWithImage: sendImageToChat,
+        promptChatWithElement: captureAndChatWithElement,
+      }}
     >
       {children}
     </ChatContext.Provider>

@@ -1,5 +1,4 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
-
 import { dataURLtoBlob, minifyPng } from "@src/utils/image-utils";
 import { useChatContext } from "@pages/content/components/on-page-agent/chat-provider";
 import { captureScreenshot } from "@src/utils/screenshot-utils";
@@ -44,8 +43,7 @@ export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
         updateUiHelperControls(imageData);
         await promptChatWithImage(
           processedScreenshot,
-          getExplainScreenShotPrompt(),
-          "audio"
+          getExplainScreenShotPrompt()
         );
 
         onScrollEnd?.();
@@ -67,13 +65,13 @@ export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
 const getExplainScreenShotPrompt = () => {
   const pageDetails = getPageDetails();
 
-  return `The image attached is a website screen shot of the user's viewport.respond ***ONLY***
-          .with the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you.
+  return `As a language model, analyze the image attached. This is a website screenshot of a viewport. respond ***ONLY***
+          .with the text of the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you!!!!.
           page details:${pageDetails}
           Fil in this JSON:
           {
-          view: //E.G Hero section, about, features items, news section,portfolio,chat,forum,video-player,gallery etc., 
-          description: //200 chars max what is the purpose of section?,
+          view: //e.g Hero section, about, features items, news section,portfolio,chat,forum,video-player,gallery etc., 
+          SectionComponents: //200  what are it the main components that exist in the image of the section? what information do they hold?,
           actions://what action are possible on this section. e.g read article, sign in, download,buy, search, playa audio/video,comment etc.
           }:{
           view:string,
@@ -81,5 +79,5 @@ const getExplainScreenShotPrompt = () => {
           actions:string[]
           }
           
-         This time respond only with the json. no text before, no text after. your response is my data.`;
+         This time respond only with the json. no text before, no text after. make sure all the components stated do exists in the image. just generate text for the JSON`;
 };

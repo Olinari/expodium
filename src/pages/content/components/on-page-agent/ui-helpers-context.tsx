@@ -8,7 +8,12 @@ import React, {
 } from "react";
 
 import { useChatContext } from "@pages/content/components/on-page-agent/chat-provider";
-import { removeRedundatRects, sortIntoMatrix } from "@src/utils/webpage-utils";
+import {
+  getHTMLElmentFromRect,
+  removeRedundatRects,
+  sortIntoMatrix,
+} from "@src/utils/webpage-utils";
+import { parseJsonFromResponse } from "@src/utils/data-utils";
 
 interface UiHelpersContextType {
   updateUiHelperControls: (data: any) => void;
@@ -17,13 +22,6 @@ interface UiHelpersContextType {
 const UiHelpersContext = createContext<UiHelpersContextType | undefined>(
   undefined
 );
-
-interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 export const useUiHelpersContext = (): UiHelpersContextType => {
   return useContext(UiHelpersContext);
@@ -46,12 +44,12 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const offset = 8 as const;
 
   const navigate = useCallback(
-    (event) => {
+    async (event) => {
       let [row, col] = selectedElementIndex;
-
+      let markup;
+      let rect;
+      let elementDetails;
       const element = elementsData[row][col];
-
-      console.log(event.key);
 
       switch (event.key) {
         case "a": // Left
@@ -70,7 +68,22 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
           break;
 
         case "Enter":
-          promptChatWithElement(element);
+          markup = getHTMLElmentFromRect(
+            element.x - 0.5 * element.width,
+            element.y - 0.5 * element.height,
+            element.width,
+            element.height,
+            element.tag
+          ).innerHTML;
+
+          rect = {
+            x: element.x * 2 - element.width,
+            y: element.y * 2 - element.height,
+            width: element.width * 2,
+            height: element.height * 2,
+          };
+          elementDetails = await promptChatWithElement(rect, markup);
+          elementDetails = parseJsonFromResponse(elementsData);
 
           break;
         default:
