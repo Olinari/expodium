@@ -27,9 +27,7 @@ export const useScreenShotContext = (): ScreenShotContextType => {
 export function ScreenShotProvider({ children }: ScreenShotProviderProps) {
   const [viewDescription, setViewDescription] = useState<string | null>(null);
   const { promptChatWithImage } = useChatContext();
-
   const { analyzeImage } = new DoctrService();
-
   const { updateUiHelperControls } = useUiHelpersContext();
 
   const handleScreenShot = async (onScrollEnd?: () => void) => {
@@ -66,7 +64,7 @@ const getExplainScreenShotPrompt = () => {
   const pageDetails = getPageDetails();
 
   return `As a language model, analyze the image attached. This is a website screenshot of a viewport. respond ***ONLY***
-          .with the text of the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you!!!!.
+          with the text of the following JSON, filled with accurate data. double check that any data you fill in is corresponding with the images I sent you!!!!.
           page details:${pageDetails}
           Fil in this JSON:
           {
@@ -79,5 +77,5 @@ const getExplainScreenShotPrompt = () => {
           actions:string[]
           }
           
-         This time respond only with the json. no text before, no text after. make sure all the components stated do exists in the image. just generate text for the JSON`;
+         This time respond only with the json. no text before, no text after. make sure all the components stated do exists in the image. dont summarize dont prefix dont state anything.just generate text for the JSON`;
 };

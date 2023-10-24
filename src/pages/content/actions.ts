@@ -1,6 +1,6 @@
 export const actions = {
-  click: (selector: string) => {
-    document.querySelector<HTMLElement>(selector).click();
+  click: (element: HTMLElement) => {
+    element.click();
   },
   navigate: (fullWebAdressIncludingHttps) => {
     window.location.href = fullWebAdressIncludingHttps;

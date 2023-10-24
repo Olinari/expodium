@@ -17,6 +17,8 @@ import { parseJsonFromResponse } from "@src/utils/data-utils";
 
 interface UiHelpersContextType {
   updateUiHelperControls: (data: any) => void;
+  selectedDomElement: HTMLElement;
+  selectedElementDetails: any;
 }
 
 const UiHelpersContext = createContext<UiHelpersContextType | undefined>(
@@ -34,6 +36,9 @@ interface UiHelpersProviderProps {
 export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   const [elementsData, setElements] = useState([]);
   const [selectedElementIndex, setSelctedElementIndex] = useState([0, 0]);
+  const [selectedDomElement, setSelectedDomElement] =
+    useState<HTMLElement>(null);
+  const [selectedElementDetails, setSelectedElementDetails] = useState(null);
 
   const updateUiHelperControls = (data: any) => {
     setElements(sortIntoMatrix(removeRedundatRects(data)));
@@ -43,9 +48,10 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
 
   const offset = 8 as const;
 
-  const navigate = useCallback(
+  const navigateUIElements = useCallback(
     async (event) => {
       let [row, col] = selectedElementIndex;
+      let domElement;
       let markup;
       let rect;
       let elementDetails;
@@ -68,13 +74,15 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
           break;
 
         case "Enter":
-          markup = getHTMLElmentFromRect(
+          domElement = getHTMLElmentFromRect(
             element.x - 0.5 * element.width,
             element.y - 0.5 * element.height,
             element.width,
             element.height,
             element.tag
-          ).innerHTML;
+          );
+
+          markup = domElement.innerHTML;
 
           rect = {
             x: element.x * 2 - element.width,
@@ -84,7 +92,8 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
           };
           elementDetails = await promptChatWithElement(rect, markup);
           elementDetails = parseJsonFromResponse(elementsData);
-
+          setSelectedElementDetails(elementDetails);
+          setSelectedDomElement(domElement);
           break;
         default:
           return;
@@ -96,12 +105,18 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", navigate);
-    return () => document.removeEventListener("keydown", navigate);
-  }, [navigate]);
+    document.addEventListener("keydown", navigateUIElements);
+    return () => document.removeEventListener("keydown", navigateUIElements);
+  }, [navigateUIElements]);
 
   return (
-    <UiHelpersContext.Provider value={{ updateUiHelperControls }}>
+    <UiHelpersContext.Provider
+      value={{
+        updateUiHelperControls,
+        selectedDomElement,
+        selectedElementDetails,
+      }}
+    >
       <>
         {elementsData.map((row, y) => {
           return row.map((element, x) => {

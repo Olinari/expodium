@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { OpenAIService } from "@src/services/open-ai";
 import { useScreenShotContext } from "@pages/content/components/on-page-agent/screenshot-context";
 import { actions } from "@pages/content/actions";
+import { JSONstringifyWithFunctions } from "@src/utils/data-utils";
 const { transcribeAudio } = new OpenAIService();
 
 interface VoiceControlProps {

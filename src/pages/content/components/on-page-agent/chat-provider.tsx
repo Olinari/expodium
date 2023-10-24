@@ -15,7 +15,7 @@ interface Rect {
 
 interface ChatContextType {
   chat: typeof Bard.chat;
-  promptChatWithElement: (element: Rect, markup: string) => void;
+  promptChatWithElement: (element: Rect, markup: string) => Promise<string>;
   promptChatWithImage: (
     image: Blob | File,
     prompt: string
@@ -52,10 +52,10 @@ const sendImageToChat = async (image: File | Blob, prompt: string) => {
 };
 
 const captureAndChatWithElement = (rect, markup) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     capturePartialScreenshot(rect, ({ dataUrl }) => {
       sendImageToChat(dataURLtoBlob(dataUrl), createPrompt(markup))
-        .then((textResponse) => {
+        .then((textResponse: string) => {
           resolve(textResponse);
         })
         .catch((error) => {
@@ -77,6 +77,7 @@ const createPrompt = (markup: string) => {
           }:{
             componentType:string,
             description:string,
+            actions:string[]
           }
           This time respond only with the json. No text before, no text after. No summaries. JUST THE JSON. Your response is my data.`;
 };
