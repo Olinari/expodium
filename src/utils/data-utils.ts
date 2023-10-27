@@ -9,6 +9,7 @@ export const JSONstringifyWithFunctions = (obj) =>
   });
 
 export const parseJsonFromResponse = (element) => {
+  console.log(element);
   let elementDetails;
   elementDetails = element.split("```")[1];
   elementDetails = elementDetails.replaceAll("\r\n", "");

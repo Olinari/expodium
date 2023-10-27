@@ -55,7 +55,8 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
       let markup;
       let rect;
       let elementDetails;
-      const element = elementsData[row][col];
+      const element = elementsData[row]?.[col];
+      if (!element) return;
 
       switch (event.key) {
         case "a": // Left
@@ -90,8 +91,10 @@ export const UiHelpersProvider = ({ children }: UiHelpersProviderProps) => {
             width: element.width * 2,
             height: element.height * 2,
           };
+
           elementDetails = await promptChatWithElement(rect, markup);
-          elementDetails = parseJsonFromResponse(elementsData);
+
+          elementDetails = parseJsonFromResponse(elementDetails);
           setSelectedElementDetails(elementDetails);
           setSelectedDomElement(domElement);
           break;

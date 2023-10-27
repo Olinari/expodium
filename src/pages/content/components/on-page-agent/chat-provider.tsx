@@ -3,6 +3,7 @@ import { BardService } from "@src/services/bard";
 import { playAudio } from "@src/utils/audio-utils";
 import { capturePartialScreenshot } from "@src/utils/screenshot-utils";
 import { dataURLtoBlob } from "@src/utils/image-utils";
+import { createPromptFormElement } from "@pages/content/components/on-page-agent/prompts";
 
 const Bard = new BardService();
 
@@ -40,7 +41,7 @@ const terminateChat = () => {
   Bard.chat.end();
 };
 
-const sendImageToChat = async (image: File | Blob, prompt: string) => {
+const promptChatWithImage = async (image: File | Blob, prompt: string) => {
   try {
     const { audio, response: text } = await Bard.chat.image(image, prompt);
     await playAudio(audio);
@@ -51,10 +52,13 @@ const sendImageToChat = async (image: File | Blob, prompt: string) => {
   }
 };
 
-const captureAndChatWithElement = (rect, markup) => {
+const promptChatWithElement = (rect, markup) => {
   return new Promise<string>((resolve, reject) => {
     capturePartialScreenshot(rect, ({ dataUrl }) => {
-      sendImageToChat(dataURLtoBlob(dataUrl), createPrompt(markup))
+      promptChatWithImage(
+        dataURLtoBlob(dataUrl),
+        createPromptFormElement(markup)
+      )
         .then((textResponse: string) => {
           resolve(textResponse);
         })
@@ -63,23 +67,6 @@ const captureAndChatWithElement = (rect, markup) => {
         });
     });
   });
-};
-
-const createPrompt = (markup: string) => {
-  return `The attached image and the following HTML are representing an element on the page I've previously sent. respond ***ONLY***
-          .with the following JSON, filled with accurate data. Double check that any data you fill in corresponds with the images I sent you.
-          markup: ${markup}
-          Fill in this JSON:
-          {
-            componentType: //The HTML component e.g div or button,
-            description: //200 chars max what is the purpose of this element?,
-            actions://what action are possible on this div. options are :['click','input','navigate']
-          }:{
-            componentType:string,
-            description:string,
-            actions:string[]
-          }
-          This time respond only with the json. No text before, no text after. No summaries. JUST THE JSON. Your response is my data.`;
 };
 
 export function ChatProvider({ children }: ChatProviderProps) {
@@ -92,8 +79,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
     <ChatContext.Provider
       value={{
         chat: Bard.chat,
-        promptChatWithImage: sendImageToChat,
-        promptChatWithElement: captureAndChatWithElement,
+        promptChatWithImage,
+        promptChatWithElement,
       }}
     >
       {children}
